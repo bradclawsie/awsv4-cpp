@@ -14,3 +14,12 @@ This library uses `openssl`, `Poco` and `boost`. I developed this on debian unst
 
 Unfortunately I don't know how these dependencies will be available on non-debian
 systems, so please tune the `Makefile` as you see fit.
+
+The `main.cpp` file uses the sample data available at 
+
+    http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
+
+and produces the output as shown in the AWS docs. Each AWS service seems
+to have its own unique needs with regard to authorization - I hope to 
+add more to this library over time and make it more useful for specific 
+services.
