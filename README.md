@@ -15,7 +15,7 @@ This library uses `openssl`, `Poco` and `boost`. I developed this on debian unst
 Unfortunately I don't know how these dependencies will be available on non-debian
 systems, so please tune the `Makefile` as you see fit.
 
-The `main.cpp` file uses the sample data available at 
+The `main.cpp` is a basic test suite that uses the sample data available at 
 
     http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
 
