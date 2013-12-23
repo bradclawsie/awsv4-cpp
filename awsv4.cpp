@@ -48,7 +48,7 @@ namespace AWSV4 {
         if (q.empty()) return "";
         const Poco::StringTokenizer tok{q,query_delim,0};
         std::vector<std::string> parts; 
-        for (const auto t:tok) {
+        for (const auto& t:tok) {
             std::string encoded_arg;
             Poco::URI::encode(t,"",encoded_arg);
             parts.push_back(encoded_arg);
@@ -61,7 +61,7 @@ namespace AWSV4 {
     const std::map<std::string,std::string> canonicalize_headers(const std::vector<std::string>& headers) {
         const std::string header_delim{":"};
         std::map<std::string,std::string> header_key2val;
-        for (const auto h:headers) {
+        for (const auto& h:headers) {
             const Poco::StringTokenizer pair{h,header_delim,2}; // 2 -> TOK_TRIM, trim whitespace
             if (pair.count() != 2) throw std::invalid_argument("malformed header:" + h);
             std::string key{pair[0]};
@@ -77,7 +77,7 @@ namespace AWSV4 {
     const std::string map_headers_string(const std::map<std::string,std::string>& header_key2val) {
         const std::string pair_delim{":"};
         std::string h;
-        for (auto& kv:header_key2val) {
+        for (const auto& kv:header_key2val) {
             h.append(kv.first + pair_delim + kv.second + ENDL);
         }
         return h;
@@ -87,7 +87,7 @@ namespace AWSV4 {
     const std::string map_signed_headers(const std::map<std::string,std::string>& header_key2val) {
         const std::string signed_headers_delim{";"};
         std::vector<std::string> ks;
-        for (auto& kv:header_key2val) {
+        for (const auto& kv:header_key2val) {
             ks.push_back(kv.first);
         }
         return boost::algorithm::join(ks,signed_headers_delim);
@@ -132,16 +132,14 @@ namespace AWSV4 {
     const std::string ISO8601_date(const std::time_t& t) {
         char buf[sizeof "20111008T070709Z"];
         std::strftime(buf, sizeof buf, "%Y%m%dT%H%M%SZ", std::gmtime(&t));
-        std::string formatted{buf};
-        return formatted;
+        return std::string{buf};
     }
 
     // time_t -> 20131222
     const std::string utc_yyyymmdd(const std::time_t& t) {
         char buf[sizeof "20111008"];
         std::strftime(buf, sizeof buf, "%Y%m%d", std::gmtime(&t));
-        std::string formatted{buf};
-        return formatted;
+        return std::string{buf};
     }
     
     // -----------------------------------------------------------------------------------
