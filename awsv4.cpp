@@ -58,15 +58,24 @@ namespace AWSV4 {
     }
 
     // create a map of the "canonicalized" headers
+    // will return empty map on malformed input.
     const std::map<std::string,std::string> canonicalize_headers(const std::vector<std::string>& headers) {
         const std::string header_delim{":"};
         std::map<std::string,std::string> header_key2val;
         for (const auto& h:headers) {
             const Poco::StringTokenizer pair{h,header_delim,2}; // 2 -> TOK_TRIM, trim whitespace
-            if (pair.count() != 2) throw std::invalid_argument("malformed header:" + h);
+            if (pair.count() != 2) { 
+                std::cerr << "malformed header: " << h << std::endl;
+                header_key2val.clear();
+                return header_key2val;
+            }
             std::string key{pair[0]};
             const std::string val{pair[1]};
-            if (key.empty() || val.empty()) throw std::invalid_argument("malformed header:" + h);
+            if (key.empty() || val.empty()) {
+                std::cerr << "malformed header: " << h << std::endl;
+                header_key2val.clear();
+                return header_key2val;
+            }
             boost::algorithm::to_lower(key);
             header_key2val[key] = val;
         }

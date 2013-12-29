@@ -36,6 +36,10 @@ int main() {
             "x-amz-date: 20110909T233600Z"};
     
     const auto canonical_headers_map = AWSV4::canonicalize_headers(headers);
+    if (canonical_headers_map.empty()) {
+        std::cerr << "headers malformed" << std::endl;
+        std::exit(1);
+    }
     const auto headers_string = AWSV4::map_headers_string(canonical_headers_map);
     const auto signed_headers = AWSV4::map_signed_headers(canonical_headers_map);
 
@@ -72,6 +76,5 @@ int main() {
                                                 string_to_sign);
     
     std::cout << signature << std::endl;
-
     return 0;
 }
