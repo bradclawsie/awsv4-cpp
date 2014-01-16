@@ -11,7 +11,6 @@
 #include <iostream>
 
 #include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string/case_conv.hpp>
 
 #include "Poco/URI.h"
 #include "Poco/StringTokenizer.h"

@@ -76,7 +76,7 @@ namespace AWSV4 {
                 header_key2val.clear();
                 return header_key2val;
             }
-            boost::algorithm::to_lower(key);
+            std::transform(key.begin(), key.end(), key.begin(),::tolower);
             header_key2val[key] = val;
         }
         return header_key2val;
