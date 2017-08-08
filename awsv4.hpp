@@ -1,8 +1,8 @@
 #ifndef AWSV4_HPP
 #define AWSV4_HPP
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #include <stdexcept>
 #include <algorithm>
