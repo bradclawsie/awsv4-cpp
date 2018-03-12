@@ -173,46 +173,37 @@ namespace AWSV4 {
                                           const std::string string_to_sign) noexcept {
 
         const std::string k1{AWS4 + secret};
-        char *c_k1 = new char [k1.length()+1];
-        std::strcpy(c_k1, k1.c_str());
-
-        auto yyyymmdd = utc_yyyymmdd(request_date);
-        char *c_yyyymmdd = new char [yyyymmdd.length()+1];
-        std::strcpy(c_yyyymmdd, yyyymmdd.c_str());
+        const std::string yyyymmdd = utc_yyyymmdd(request_date);
 
         unsigned char* kDate;
-        kDate = HMAC(EVP_sha256(), c_k1, strlen(c_k1), 
-                     (unsigned char*)c_yyyymmdd, strlen(c_yyyymmdd), NULL, NULL); 
+        unsigned int kDateLen;
+        kDate = HMAC(EVP_sha256(), k1.c_str(), k1.size(), 
+                     reinterpret_cast<const unsigned char*>(yyyymmdd.c_str()), yyyymmdd.size(), NULL, &kDateLen); 
 
-        char *c_region = new char [region.length()+1];
-        std::strcpy(c_region, region.c_str());        
         unsigned char *kRegion;
-        kRegion = HMAC(EVP_sha256(), kDate, strlen((char *)kDate), 
-                     (unsigned char*)c_region, strlen(c_region), NULL, NULL); 
+        unsigned int kRegionLen;
+        kRegion = HMAC(EVP_sha256(), kDate, kDateLen, 
+                     reinterpret_cast<const unsigned char*>(region.c_str()), region.size(), NULL, &kRegionLen);
 
-        char *c_service = new char [service.length()+1];
-        std::strcpy(c_service, service.c_str());        
         unsigned char *kService;
-        kService = HMAC(EVP_sha256(), kRegion, strlen((char *)kRegion), 
-                     (unsigned char*)c_service, strlen(c_service), NULL, NULL); 
+        unsigned int kServiceLen;
+        kService = HMAC(EVP_sha256(), kRegion, kRegionLen, 
+                     reinterpret_cast<const unsigned char*>(service.c_str()), service.size(), NULL, &kServiceLen);
 
-        char *c_aws4_request = new char [AWS4_REQUEST.length()+1];
-        std::strcpy(c_aws4_request, AWS4_REQUEST.c_str());        
         unsigned char *kSigning;
-        kSigning = HMAC(EVP_sha256(), kService, strlen((char *)kService), 
-                     (unsigned char*)c_aws4_request, strlen(c_aws4_request), NULL, NULL); 
+        unsigned int kSigningLen;
+        kSigning = HMAC(EVP_sha256(), kService, kServiceLen, 
+                     reinterpret_cast<const unsigned char*>(AWS4_REQUEST.c_str()), AWS4_REQUEST.size(), NULL, &kSigningLen); 
 
-        char *c_string_to_sign = new char [string_to_sign.length()+1];
-        std::strcpy(c_string_to_sign, string_to_sign.c_str());        
         unsigned char *kSig;
-        kSig = HMAC(EVP_sha256(), kSigning, strlen((char *)kSigning), 
-                     (unsigned char*)c_string_to_sign, strlen(c_string_to_sign), NULL, NULL); 
-
-        char outputBuffer[65];
-        for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-            sprintf(outputBuffer + (i * 2), "%02x", kSig[i]);
+        unsigned int kSigLen;
+        kSig = HMAC(EVP_sha256(), kSigning, kSigningLen, 
+                     reinterpret_cast<const unsigned char*>(string_to_sign.c_str()), string_to_sign.size(), NULL, &kSigLen); 
+        
+        std::stringstream output;
+        for (int i=0; i < SHA256_DIGEST_LENGTH; i++) {
+           output << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(kSig[i]);
         }
-        outputBuffer[64] = 0;
-        return std::string{outputBuffer};
+        return output.str();
     }
 }
